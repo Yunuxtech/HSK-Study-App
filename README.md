@@ -61,7 +61,7 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/hsk-study-app.git
+   git clone https://github.com/Yunuxtech/HSK-Study-App.git
    cd hsk-study-app
    ```
 
@@ -236,7 +236,7 @@ vercel
 npm install --save-dev gh-pages
 
 # Add to package.json:
-"homepage": "https://yourusername.github.io/hsk-study-app",
+"homepage": "https://github.com/Yunuxtech/HSK-Study-App",
 "scripts": {
   "predeploy": "npm run build",
   "deploy": "gh-pages -d build"
@@ -282,10 +282,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Inspired by the need for effective Chinese language learning tools
 
 ## 📧 Contact
-
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
-
-Project Link: [https://github.com/yourusername/hsk-study-app](https://github.com/yourusername/hsk-study-app)
+Project Link: [https://github.com/Yunuxtech/HSK-Study-App]
 
 ## 🗺️ Roadmap
 
