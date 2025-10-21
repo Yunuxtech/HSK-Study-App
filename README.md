@@ -27,7 +27,7 @@ A modern, interactive web application built with React to help you master Chines
 
 ## 🚀 Demo
 
-[Live Demo](#) *(Add your deployed link here)*
+[Live Demo](https://hskstudyapp.netlify.app/)
 
 ## 🖼️ Screenshots
 
