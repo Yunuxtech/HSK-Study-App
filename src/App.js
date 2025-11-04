@@ -4,6 +4,7 @@ import { BookOpen, RefreshCw, Award, ChevronRight, Loader } from 'lucide-react';
 export default function HSKStudyApp() {
   const [level, setLevel] = useState(1);
   const [mode, setMode] = useState('menu');
+  const [sentences, setSentences] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState([]);
@@ -21,10 +22,11 @@ export default function HSKStudyApp() {
         setError(null);
 
         // Load all three HSK level files
-        const [hsk1Response, hsk2Response, hsk3Response] = await Promise.all([
+        const [hsk1Response, hsk2Response, hsk3Response, sentencesResponse] = await Promise.all([
           fetch('/hsk1.json'),
           fetch('/hsk2.json'),
-          fetch('/hsk3.json')
+          fetch('/hsk3.json'),
+          fetch('/sentences.json')
         ]);
 
         if (!hsk1Response.ok || !hsk2Response.ok || !hsk3Response.ok) {
@@ -34,6 +36,11 @@ export default function HSKStudyApp() {
         const hsk1Data = await hsk1Response.json();
         const hsk2Data = await hsk2Response.json();
         const hsk3Data = await hsk3Response.json();
+        
+        let sentencesData = { 1: [], 2: [], 3: [] };
+        if (sentencesResponse.ok) {
+          sentencesData = await sentencesResponse.json();
+        }
 
         setHskData({
           1: hsk1Data,
@@ -41,6 +48,7 @@ export default function HSKStudyApp() {
           3: hsk3Data
         });
         
+        setSentences(sentencesData);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -79,6 +87,11 @@ export default function HSKStudyApp() {
     setQuizAnswers([]);
     setScore(0);
     setMode('quiz');
+  };
+
+  const startReading = () => {
+    shuffleWords();
+    setMode('reading');
   };
 
   const generateQuizOptions = (correctWord) => {
@@ -191,7 +204,7 @@ export default function HSKStudyApp() {
               ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-6">
               <button
                 onClick={startFlashcards}
                 className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-6 px-8 rounded-xl font-bold text-xl hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-3"
@@ -205,6 +218,13 @@ export default function HSKStudyApp() {
               >
                 <Award size={28} />
                 Quiz Mode
+              </button>
+              <button
+                onClick={startReading}
+                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-6 px-8 rounded-xl font-bold text-xl hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-3"
+              >
+                <BookOpen size={28} />
+                Reading Practice
               </button>
             </div>
           </div>
@@ -318,10 +338,10 @@ export default function HSKStudyApp() {
 
           <div className="bg-white rounded-3xl shadow-2xl p-12 mb-8">
             <div className="text-center mb-12">
-              <div className="text-7xl font-bold text-green-900 mb-6">
+              <div className="text-7xl font-bold text-green-900 mb-4">
                 {currentWord.char}
               </div>
-              <div className="text-2xl text-gray-500 mb-8">
+              <div className="text-3xl text-gray-500 font-semibold mb-8">
                 {currentWord.pinyin}
               </div>
               <div className="text-xl text-gray-700 font-semibold mb-8">
@@ -410,6 +430,133 @@ export default function HSKStudyApp() {
                 Back to Menu
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'reading') {
+    const levelSentences = sentences[level] || [];
+    const currentSentence = levelSentences[currentIndex];
+    
+    if (!currentSentence) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">No Sentences Available</h2>
+              <p className="text-gray-600 mb-8">
+                Reading practice sentences are not available for this level yet.
+              </p>
+              <p className="text-sm text-gray-500 mb-8">
+                Create a <code className="bg-gray-100 px-2 py-1 rounded">sentences.json</code> file in the public folder with sentence data.
+              </p>
+              <button
+                onClick={() => setMode('menu')}
+                className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-xl hover:bg-indigo-700 transition-all"
+              >
+                Back to Menu
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <button
+              onClick={() => setMode('menu')}
+              className="bg-white text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all"
+            >
+              ← Back
+            </button>
+            <div className="text-xl font-bold text-indigo-900">
+              HSK {level} Reading Practice
+            </div>
+            <button
+              onClick={() => {
+                const currentLevelSentences = [...(sentences[level] || [])];
+                for (let i = currentLevelSentences.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  [currentLevelSentences[i], currentLevelSentences[j]] = [currentLevelSentences[j], currentLevelSentences[i]];
+                }
+                setSentences({ ...sentences, [level]: currentLevelSentences });
+                setCurrentIndex(0);
+                setShowAnswer(false);
+              }}
+              className="bg-white text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all flex items-center gap-2"
+            >
+              <RefreshCw size={18} /> Shuffle
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-12 mb-8 min-h-96">
+            <div className="mb-8">
+              <div className="text-5xl font-bold text-indigo-900 mb-6 leading-relaxed text-center">
+                {currentSentence.chinese}
+              </div>
+              {/* <div className="text-2xl text-gray-500 mb-8 text-center leading-relaxed">
+                {currentSentence.pinyin}
+              </div> */}
+              
+              {showAnswer ? (
+                <div className="mt-8 p-8 bg-green-50 rounded-xl animate-fade-in">
+                  <div className="text-3xl text-gray-800 font-semibold text-center leading-relaxed">
+                    {currentSentence.english}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <button
+                    onClick={() => setShowAnswer(true)}
+                    className="bg-indigo-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-indigo-700 transition-all hover:scale-105 shadow-lg"
+                  >
+                    Show Translation
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => {
+                if (currentIndex > 0) {
+                  setCurrentIndex(currentIndex - 1);
+                  setShowAnswer(false);
+                }
+              }}
+              disabled={currentIndex === 0}
+              className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
+                currentIndex === 0
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              ← Previous
+            </button>
+            
+            <div className="text-lg font-semibold text-indigo-900">
+              {currentIndex + 1} / {levelSentences.length}
+            </div>
+            
+            <button
+              onClick={() => {
+                if (currentIndex < levelSentences.length - 1) {
+                  setCurrentIndex(currentIndex + 1);
+                  setShowAnswer(false);
+                } else {
+                  setMode('menu');
+                }
+              }}
+              className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-all flex items-center gap-2"
+            >
+              {currentIndex === levelSentences.length - 1 ? 'Finish' : 'Next'} <ChevronRight size={20} />
+            </button>
           </div>
         </div>
       </div>
