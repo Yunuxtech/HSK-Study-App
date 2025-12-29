@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, RefreshCw, Award, ChevronRight, Loader } from 'lucide-react';
+// import { BookOpen, RefreshCw, Award, ChevronRight, Loader } from 'lucide-react';
+import { BookOpen, RefreshCw, Award, ChevronRight, Loader, Volume2 } from 'lucide-react';
 
 export default function HSKStudyApp() {
   const [level, setLevel] = useState(1);
@@ -141,6 +142,21 @@ export default function HSKStudyApp() {
     }
   };
 
+  const speakChinese = (text) => {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    utterance.rate = 0.8;
+    utterance.pitch = 1;
+    
+    window.speechSynthesis.speak(utterance);
+  } else {
+    alert('Sorry, your browser does not support text-to-speech.');
+  }
+};
+
   // Loading state
   if (loading) {
     return (
@@ -237,6 +253,82 @@ export default function HSKStudyApp() {
     );
   }
 
+  // if (mode === 'flashcard') {
+  //   const currentWord = shuffledWords[currentIndex];
+    
+  //   return (
+  //     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-8">
+  //       <div className="max-w-2xl mx-auto">
+  //         <div className="flex justify-between items-center mb-8">
+  //           <button
+  //             onClick={() => setMode('menu')}
+  //             className="bg-white text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all"
+  //           >
+  //             ← Back
+  //           </button>
+  //           <div className="text-xl font-bold text-purple-900">
+  //             HSK {level} Flashcards
+  //           </div>
+  //           <button
+  //             onClick={shuffleWords}
+  //             className="bg-white text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all flex items-center gap-2"
+  //           >
+  //             <RefreshCw size={18} /> Shuffle
+  //           </button>
+  //         </div>
+
+  //         <div className="bg-white rounded-3xl shadow-2xl p-12 mb-8 min-h-96 flex flex-col justify-center">
+  //           <div className="text-center mb-8">
+  //             <div className="text-8xl font-bold text-indigo-900 mb-6">
+  //               {currentWord.char}
+  //             </div>
+  //             <div className="text-3xl text-gray-500 mb-8">
+  //               {currentWord.pinyin}
+  //             </div>
+              
+  //             {showAnswer ? (
+  //               <div className="text-4xl font-semibold text-green-600 animate-fade-in">
+  //                 {currentWord.meaning}
+  //               </div>
+  //             ) : (
+  //               <button
+  //                 onClick={() => setShowAnswer(true)}
+  //                 className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-xl hover:bg-indigo-700 transition-all"
+  //               >
+  //                 Show Meaning
+  //               </button>
+  //             )}
+  //           </div>
+  //         </div>
+
+  //         <div className="flex justify-between items-center">
+  //           <button
+  //             onClick={prevCard}
+  //             disabled={currentIndex === 0}
+  //             className={`px-8 py-4 rounded-xl font-bold text-lg transition-all ${
+  //               currentIndex === 0
+  //                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+  //                 : 'bg-white text-gray-700 hover:bg-gray-100'
+  //             }`}
+  //           >
+  //             ← Previous
+  //           </button>
+            
+  //           <div className="text-lg font-semibold text-purple-900">
+  //             {currentIndex + 1} / {shuffledWords.length}
+  //           </div>
+            
+  //           <button
+  //             onClick={nextCard}
+  //             className="bg-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-purple-700 transition-all flex items-center gap-2"
+  //           >
+  //             {currentIndex === shuffledWords.length - 1 ? 'Finish' : 'Next'} <ChevronRight size={20} />
+  //           </button>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
   if (mode === 'flashcard') {
     const currentWord = shuffledWords[currentIndex];
     
@@ -261,7 +353,15 @@ export default function HSKStudyApp() {
             </button>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-2xl p-12 mb-8 min-h-96 flex flex-col justify-center">
+          <div className="bg-white rounded-3xl shadow-2xl p-12 mb-8 min-h-96 flex flex-col justify-center relative">
+            <button
+              onClick={() => speakChinese(currentWord.char)}
+              className="absolute top-6 right-6 bg-indigo-100 hover:bg-indigo-200 text-indigo-600 p-4 rounded-full transition-all hover:scale-110 shadow-lg"
+              title="Pronounce character"
+            >
+              <Volume2 size={28} />
+            </button>
+            
             <div className="text-center mb-8">
               <div className="text-8xl font-bold text-indigo-900 mb-6">
                 {currentWord.char}
