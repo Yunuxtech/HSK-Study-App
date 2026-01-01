@@ -148,7 +148,7 @@ export default function HSKStudyApp() {
     
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
-    utterance.rate = 0.3;
+    utterance.rate = 0.7;
     utterance.pitch = 1;
     
     window.speechSynthesis.speak(utterance);
